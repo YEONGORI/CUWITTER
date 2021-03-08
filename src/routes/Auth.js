@@ -5,6 +5,7 @@ const Auth = () => {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
 	const [newAccount, setNewAccount] = useState(true)
+	const [error, setError] = useState("")
 
 	const onChange = event => {
 		const {
@@ -19,11 +20,21 @@ const Auth = () => {
 
 	const onSubmit = async event => {
 		event.preventDefault()
-		if (newAccount) {
-			await authService.createUserWithEmailAndPassword(email, password)
-		} else {
-			// 로그인
+		try {
+			let data
+			if (newAccount) {
+				data = await authService.createUserWithEmailAndPassword(email, password)
+			} else {
+				data = await authService.signInWithEmailAndPassword(email, password)
+			}
+			console.log(data)
+		} catch (error) {
+			setError(error.message)
 		}
+	}
+
+	const toggleAccount = () => {
+		setNewAccount(prev => !prev)
 	}
 
 	return (
@@ -46,7 +57,9 @@ const Auth = () => {
 					onChange={onChange}
 				/>
 				<input type="submit" value={newAccount ? "회원가입" : "로그인"} />
+				{error}
 			</form>
+			<span onClick={toggleAccount}>{newAccount ? "로그인" : "회원가입"}</span>
 			<div>
 				<button>구글 아이디로 계속하기</button>
 				<button>깃허브 아이디로 계속하기</button>
