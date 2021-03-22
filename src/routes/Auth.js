@@ -1,4 +1,4 @@
-import { authService } from "fBase"
+import { authService, firebaseInstance } from "fBase"
 import React, { useState } from "react"
 
 const Auth = () => {
@@ -37,6 +37,21 @@ const Auth = () => {
 		setNewAccount(prev => !prev)
 	}
 
+	const onSocialClick = async event => {
+		const {
+			target: { name },
+		} = event
+		let provider
+		if (name === "google") {
+			provider = new firebaseInstance.auth.GoogleAuthProvider()
+		} else if (name === "github") {
+			provider = new firebaseInstance.auth.GithubAuthProvider()
+		}
+
+		const data = await authService.signInWithPopup(provider)
+		console.log(data)
+	}
+
 	return (
 		<div>
 			<form onSubmit={onSubmit}>
@@ -61,8 +76,12 @@ const Auth = () => {
 			</form>
 			<span onClick={toggleAccount}>{newAccount ? "로그인" : "회원가입"}</span>
 			<div>
-				<button>구글 아이디로 계속하기</button>
-				<button>깃허브 아이디로 계속하기</button>
+				<button onClick={onSocialClick} name="google">
+					구글 아이디로 계속하기
+				</button>
+				<button onClick={onSocialClick} name="github">
+					깃허브 아이디로 계속하기
+				</button>
 			</div>
 		</div>
 	)
