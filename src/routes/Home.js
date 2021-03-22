@@ -1,9 +1,15 @@
+import { dbService } from "fBase"
 import React, { useState } from "react"
 
 const Home = () => {
 	const [cuweet, setCuweet] = useState("")
-	const onSubmit = event => {
+	const onSubmit = async event => {
 		event.preventDefault()
+		await dbService.collection("cuweets").add({
+			cuweet,
+			createAt: Date.now(),
+		})
+		setCuweet("")
 	}
 
 	const onChange = event => {
@@ -15,7 +21,7 @@ const Home = () => {
 
 	return (
 		<div>
-			<form action="">
+			<form onSubmit={onSubmit}>
 				<input
 					value={cuweet}
 					onChange={onChange}
