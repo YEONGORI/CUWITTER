@@ -5,10 +5,12 @@ import { authService } from "fBase"
 const App = () => {
 	const [init, setInit] = useState(false)
 	const [isLoggedIn, setIsLoggedIn] = useState(false)
+	const [userObj, setUserObj] = useState(null)
 	useEffect(() => {
 		authService.onAuthStateChanged(user => {
 			if (user) {
 				setIsLoggedIn(true)
+				setUserObj(user)
 			} else {
 				setIsLoggedIn(false)
 			}
@@ -17,8 +19,12 @@ const App = () => {
 	}, [])
 	return (
 		<>
-			{init ? <AppRouter isLoggedIn={isLoggedIn} /> : "초기화중.."};
-			<footer>&copy; Cuwitter {new Date().getFullYear()} Cuwitter</footer>
+			{init ? (
+				<AppRouter isLoggedIn={isLoggedIn} userObj={userObj} />
+			) : (
+				"초기화중.."
+			)}
+			;<footer>&copy; Cuwitter {new Date().getFullYear()} Cuwitter</footer>
 		</>
 	)
 }

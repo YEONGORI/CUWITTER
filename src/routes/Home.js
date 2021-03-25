@@ -1,27 +1,36 @@
 import { dbService } from "fBase"
 import React, { useState, useEffect } from "react"
 
-const Home = () => {
+const Home = ({ userObj }) => {
 	const [cuweet, setCuweet] = useState("")
 	const [cuweets, setCuweets] = useState([])
-	const getCuweets = async () => {
-		const dbCuweets = await dbService.collection("cuweets").get()
-		dbCuweets.forEach(document => {
-			const cuweetObject = {
-				...document.data(),
-				id: document.id,
-			}
-			setCuweets(prev => [cuweetObject, ...prev])
-		})
-	}
+
+	// const getCuweets = async () => {
+	// 	const dbCuweets = await dbService.collection("cuweets").get()
+	// 	dbCuweets.forEach(document => {
+	// 		const cuweetObject = {
+	// 			...document.data(),
+	// 			id: document.id,
+	// 		}
+	// 		setCuweets(prev => [cuweetObject, ...prev])
+	// 	})
+	// }
 	useEffect(() => {
-		getCuweets()
+		// getCuweets()
+		dbService.collection("cuweets").onSnapshot(snapshot => {
+			const cuweetArray = snapshot.docs.map(doc => ({
+				id: doc.id,
+				...doc.data(),
+			}))
+			setCuweets(cuweetArray)
+		})
 	}, [])
 	const onSubmit = async event => {
 		event.preventDefault()
 		await dbService.collection("cuweets").add({
-			cuweet,
+			text: cuweet,
 			createAt: Date.now(),
+			createrId: userObj.uid,
 		})
 		setCuweet("")
 	}
@@ -32,7 +41,6 @@ const Home = () => {
 		} = event
 		setCuweet(value)
 	}
-	console.log(cuweets)
 
 	return (
 		<div>
@@ -49,7 +57,7 @@ const Home = () => {
 			<div>
 				{cuweets.map(cuweet => (
 					<div key={cuweet.id}>
-						<h4>{cuweet.cuweet}</h4>
+						<h4>{cuweet.text}</h4>
 					</div>
 				))}
 			</div>
